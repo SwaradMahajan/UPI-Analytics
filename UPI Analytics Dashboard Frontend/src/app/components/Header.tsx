@@ -1,14 +1,40 @@
 import { useState } from "react";
-import { Download, SlidersHorizontal, Zap } from "lucide-react";
+import { Download, Play, RotateCcw, SlidersHorizontal, Zap } from "lucide-react";
 import { navItems } from "./data";
-import { useSimulation } from "../SimulationContext";
+import { defaultState, useSimulation } from "../SimulationContext";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
 
 export function Header() {
   const [active, setActive] = useState("Dashboard");
-  const { state, setState } = useSimulation();
+  const [isOpen, setIsOpen] = useState(false);
+  const { state, setState, resetState } = useSimulation();
+  const [draftState, setDraftState] = useState(state);
+
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setDraftState(state);
+    }
+    setIsOpen(open);
+  };
+
+  const handleSimulate = () => {
+    setState(draftState);
+    setIsOpen(false);
+  };
+
+  const handleReset = () => {
+    resetState();
+    setDraftState(defaultState);
+    setIsOpen(false);
+  };
+
+  const isModified =
+    state.totalTransactions !== defaultState.totalTransactions ||
+    state.successRate !== defaultState.successRate ||
+    state.mdrRate !== defaultState.mdrRate ||
+    state.mdrChurn !== defaultState.mdrChurn;
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -53,13 +79,19 @@ export function Header() {
 
         {/* Right actions */}
         <div className="ml-auto flex items-center gap-2">
-          <Popover>
+          <Popover open={isOpen} onOpenChange={handleOpenChange}>
             <PopoverTrigger asChild>
-              <button className="grid size-9 place-items-center rounded-lg border border-border bg-input text-muted-foreground transition-colors hover:text-foreground">
+              <button
+                className="relative grid size-9 place-items-center rounded-lg border border-border bg-input text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
+                title="Simulation Filters"
+              >
                 <SlidersHorizontal className="size-4" />
+                {isModified && (
+                  <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-primary" />
+                )}
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-5" align="end">
+            <PopoverContent className="w-80 p-5 shadow-xl" align="end">
               <div className="space-y-6">
                 <div>
                   <h4 className="font-semibold leading-none text-foreground">Simulation Settings</h4>
@@ -70,34 +102,81 @@ export function Header() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <Label htmlFor="txns">Total Transactions</Label>
-                      <span className="text-[0.8125rem] text-muted-foreground">{state.totalTransactions.toLocaleString()}</span>
+                      <span className="text-[0.8125rem] text-muted-foreground font-mono">{draftState.totalTransactions.toLocaleString()}</span>
                     </div>
-                    <Slider id="txns" min={5000} max={50000} step={1000} value={[state.totalTransactions]} onValueChange={([v]) => setState(s => ({...s, totalTransactions: v}))} />
+                    <Slider
+                      id="txns"
+                      min={5000}
+                      max={50000}
+                      step={1000}
+                      value={[draftState.totalTransactions]}
+                      onValueChange={([v]) => setDraftState(s => ({...s, totalTransactions: v}))}
+                    />
                   </div>
                   
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <Label htmlFor="success">Success Rate (%)</Label>
-                      <span className="text-[0.8125rem] text-muted-foreground">{state.successRate.toFixed(2)}%</span>
+                      <span className="text-[0.8125rem] text-muted-foreground font-mono">{draftState.successRate.toFixed(2)}%</span>
                     </div>
-                    <Slider id="success" min={50} max={99} step={0.1} value={[state.successRate]} onValueChange={([v]) => setState(s => ({...s, successRate: v}))} />
+                    <Slider
+                      id="success"
+                      min={50}
+                      max={99}
+                      step={0.1}
+                      value={[draftState.successRate]}
+                      onValueChange={([v]) => setDraftState(s => ({...s, successRate: v}))}
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <Label htmlFor="mdr">MDR Rejections (%)</Label>
-                      <span className="text-[0.8125rem] text-muted-foreground">{state.mdrRate.toFixed(2)}%</span>
+                      <span className="text-[0.8125rem] text-muted-foreground font-mono">{draftState.mdrRate.toFixed(2)}%</span>
                     </div>
-                    <Slider id="mdr" min={0.5} max={15} step={0.1} value={[state.mdrRate]} onValueChange={([v]) => setState(s => ({...s, mdrRate: v}))} />
+                    <Slider
+                      id="mdr"
+                      min={0.5}
+                      max={15}
+                      step={0.1}
+                      value={[draftState.mdrRate]}
+                      onValueChange={([v]) => setDraftState(s => ({...s, mdrRate: v}))}
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <Label htmlFor="churn">MDR Churn (%)</Label>
-                      <span className="text-[0.8125rem] text-muted-foreground">{state.mdrChurn.toFixed(1)}%</span>
+                      <span className="text-[0.8125rem] text-muted-foreground font-mono">{draftState.mdrChurn.toFixed(1)}%</span>
                     </div>
-                    <Slider id="churn" min={10} max={95} step={0.1} value={[state.mdrChurn]} onValueChange={([v]) => setState(s => ({...s, mdrChurn: v}))} />
+                    <Slider
+                      id="churn"
+                      min={10}
+                      max={95}
+                      step={0.1}
+                      value={[draftState.mdrChurn]}
+                      onValueChange={([v]) => setDraftState(s => ({...s, mdrChurn: v}))}
+                    />
                   </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2 border-t border-border">
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-[0.8125rem] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    <RotateCcw className="size-3.5" />
+                    Reset
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSimulate}
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-[0.8125rem] font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs cursor-pointer"
+                  >
+                    <Play className="size-3.5 fill-current" />
+                    Simulate
+                  </button>
                 </div>
               </div>
             </PopoverContent>

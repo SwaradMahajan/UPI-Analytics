@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState, useMemo, ReactNode } from "react";
+import React, { createContext, useContext, useState, useMemo, ReactNode } from "react";
 import { COLORS } from "./components/data";
 
 export type SimulationState = {
@@ -19,9 +19,10 @@ export type SimulationContextType = {
     keyFindings: any[];
     kpis: any[];
   };
+  resetState: () => void;
 };
 
-const defaultState: SimulationState = {
+export const defaultState: SimulationState = {
   totalTransactions: 10000,
   successRate: 83.73,
   mdrRate: 2.07,
@@ -32,6 +33,10 @@ const SimulationContext = createContext<SimulationContextType | null>(null);
 
 export function SimulationProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<SimulationState>(defaultState);
+
+  const resetState = () => {
+    setState(defaultState);
+  };
 
   const derivedData = useMemo(() => {
     const { totalTransactions, successRate, mdrRate, mdrChurn } = state;
@@ -146,7 +151,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
   }, [state]);
 
   return (
-    <SimulationContext.Provider value={{ state, setState, derivedData }}>
+    <SimulationContext.Provider value={{ state, setState, resetState, derivedData }}>
       {children}
     </SimulationContext.Provider>
   );
