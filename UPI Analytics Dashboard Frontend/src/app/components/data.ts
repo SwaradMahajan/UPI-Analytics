@@ -1,4 +1,4 @@
-// Shared realistic dashboard data for Slice Analytics — UPI Payment Insights
+// Shared realistic dashboard data for Fintech Analytics — UPI Payment Insights
 
 export const COLORS = {
   primary: "#b3607a",

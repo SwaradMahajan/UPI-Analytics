@@ -1,7 +1,10 @@
 import { Target, TrendingDown, TrendingUp } from "lucide-react";
 import { Card } from "./primitives";
+import { useSimulation } from "../SimulationContext";
 
 export function Targets() {
+  const { state } = useSimulation();
+
   return (
     <div>
       <div className="mb-4 flex items-center gap-2">
@@ -43,7 +46,7 @@ export function Targets() {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <div className="text-[0.6875rem] text-muted-foreground">Baseline</div>
-              <div className="text-[1.5rem] font-bold text-danger" style={{ fontVariantNumeric: "tabular-nums" }}>62.8%</div>
+              <div className="text-[1.5rem] font-bold text-danger" style={{ fontVariantNumeric: "tabular-nums" }}>{state.mdrChurn.toFixed(1)}%</div>
             </div>
             <TrendingDown className="mb-1 size-5 text-success" />
             <div className="text-right">
@@ -52,8 +55,8 @@ export function Targets() {
             </div>
           </div>
           <div className="mt-4 flex h-2.5 gap-1">
-            <div className="h-full rounded-l-full bg-danger" style={{ width: "62.8%" }} />
-            <div className="h-full rounded-r-full bg-success/40" style={{ width: "37.2%" }} />
+            <div className="h-full rounded-l-full bg-danger" style={{ width: `${state.mdrChurn}%` }} />
+            <div className="h-full rounded-r-full bg-success/40" style={{ width: `${100 - state.mdrChurn}%` }} />
           </div>
         </Card>
 
@@ -66,7 +69,7 @@ export function Targets() {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <div className="text-[0.6875rem] text-muted-foreground">Baseline</div>
-              <div className="text-[1.5rem] font-bold text-foreground" style={{ fontVariantNumeric: "tabular-nums" }}>37.2%</div>
+              <div className="text-[1.5rem] font-bold text-foreground" style={{ fontVariantNumeric: "tabular-nums" }}>{(100 - state.mdrChurn).toFixed(1)}%</div>
             </div>
             <TrendingUp className="mb-1 size-5 text-success" />
             <div className="text-right">
@@ -78,7 +81,7 @@ export function Targets() {
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-black/[0.06]">
               <div className="h-full rounded-full bg-success" style={{ width: "70%" }} />
             </div>
-            <div className="mt-2 text-[0.6875rem] text-success">+32.8pt projected uplift</div>
+            <div className="mt-2 text-[0.6875rem] text-success">+{Math.max(0, 70 - (100 - state.mdrChurn)).toFixed(1)}pt projected uplift</div>
           </div>
         </Card>
       </div>

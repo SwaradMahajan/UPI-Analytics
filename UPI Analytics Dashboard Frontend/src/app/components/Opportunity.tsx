@@ -1,5 +1,6 @@
 import { ArrowRight, CreditCard, Sparkles, Wallet } from "lucide-react";
 import { SectionHeading } from "./primitives";
+import { useSimulation } from "../SimulationContext";
 
 function FlowStep({
   label,
@@ -26,6 +27,8 @@ function Arrow() {
 }
 
 export function Opportunity() {
+  const { state } = useSimulation();
+  
   return (
     <section className="rounded-[1.15rem] border border-white/70 bg-[#fbf9f5]/85 p-6 backdrop-blur-xl shadow-[0_2px_4px_rgba(74,60,55,0.08),0_22px_48px_-26px_rgba(74,60,55,0.28),inset_0_1px_0_rgba(255,255,255,0.7)] md:p-8">
       <div>
@@ -49,13 +52,13 @@ export function Opportunity() {
                 Current Experience
               </div>
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-0">
-                <div className="flex-1"><FlowStep label="Slice CC Payment" tone="neutral" /></div>
+                <div className="flex-1"><FlowStep label="Credit Card Payment" tone="neutral" /></div>
                 <div className="md:px-2"><Arrow /></div>
                 <div className="flex-1"><FlowStep label="Merchant Rejects" tone="danger" /></div>
                 <div className="md:px-2"><Arrow /></div>
                 <div className="flex-1"><FlowStep label="Generic Transaction Failed Screen" tone="danger" /></div>
                 <div className="md:px-2"><Arrow /></div>
-                <div className="flex-1"><FlowStep label="62.8% User Churn" tone="danger" /></div>
+                <div className="flex-1"><FlowStep label={`${state.mdrChurn.toFixed(1)}% User Churn`} tone="danger" /></div>
               </div>
             </div>
 
@@ -65,13 +68,13 @@ export function Opportunity() {
                 Proposed Experience
               </div>
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-0">
-                <div className="flex-1"><FlowStep label="Slice CC Payment" tone="neutral" /></div>
+                <div className="flex-1"><FlowStep label="Credit Card Payment" tone="neutral" /></div>
                 <div className="md:px-2"><Arrow /></div>
                 <div className="flex-1"><FlowStep label="Merchant Rejects" tone="neutral" /></div>
                 <div className="md:px-2"><Arrow /></div>
                 <div className="flex-1"><FlowStep label="Smart Fallback Bottom Sheet" tone="purple" /></div>
                 <div className="md:px-2"><Arrow /></div>
-                <div className="flex-1"><FlowStep label="Pay via Slice Savings" tone="purple" /></div>
+                <div className="flex-1"><FlowStep label="Pay via In-App Wallet" tone="purple" /></div>
                 <div className="md:px-2"><Arrow /></div>
                 <div className="flex-1"><FlowStep label="Higher Session Completion" tone="success" /></div>
               </div>
@@ -104,7 +107,7 @@ export function Opportunity() {
                     <Wallet className="size-4" />
                   </div>
                   <div>
-                    <div className="text-[0.8125rem] text-foreground">Slice Savings</div>
+                    <div className="text-[0.8125rem] text-foreground">In-App Wallet</div>
                     <div className="text-[0.6875rem] text-muted-foreground" style={{ fontVariantNumeric: "tabular-nums" }}>
                       Balance: ₹8,620
                     </div>
@@ -113,7 +116,7 @@ export function Opportunity() {
               </div>
 
               <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-[0.875rem] font-semibold text-white transition-colors hover:bg-primary/90">
-                Pay ₹2,450 via Slice Savings
+                Pay ₹2,450 via In-App Wallet
                 <ArrowRight className="size-4" />
               </button>
               <div className="mt-3 text-center text-[0.6875rem] text-muted-foreground">

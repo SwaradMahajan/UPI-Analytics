@@ -1,12 +1,23 @@
 import { ArrowRight, Lightbulb, TrendingDown, TrendingUp } from "lucide-react";
 import { Card, SectionHeading } from "./primitives";
+import { useSimulation } from "../SimulationContext";
 
 export function Funnel() {
+  const { derivedData, state } = useSimulation();
+  
+  // Find MDR count
+  const mdrStatus = derivedData.statusDistribution.find((s: any) => s.key === "mdr");
+  const totalMDR = mdrStatus?.count || 0;
+  
+  // Find churned/retained
+  const churned = derivedData.postRejection.find((p: any) => p.name === "Churned");
+  const retained = derivedData.postRejection.find((p: any) => p.name === "Retained");
+
   return (
     <Card className="p-6" elevated>
       <SectionHeading
         title="MDR Rejection → User Outcome Funnel"
-        subtitle="What happens to users after a merchant rejects their Slice Credit Card"
+        subtitle="What happens to users after a merchant rejects their primary Credit Card"
       />
 
       <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[220px_48px_1fr]">
@@ -16,7 +27,7 @@ export function Funnel() {
             Entry Point
           </div>
           <div className="mt-2 text-[3rem] font-bold leading-none tracking-tight text-foreground" style={{ fontSize: "3rem", fontVariantNumeric: "tabular-nums" }}>
-            207
+            {totalMDR.toLocaleString()}
           </div>
           <div className="mt-2 text-[0.8125rem] text-muted-foreground">MDR Rejections</div>
         </div>
@@ -42,10 +53,10 @@ export function Funnel() {
                 </div>
                 <div className="mt-3 flex items-baseline gap-3">
                   <span className="text-[2.75rem] font-bold leading-none tracking-tight text-foreground" style={{ fontSize: "2.75rem", fontVariantNumeric: "tabular-nums" }}>
-                    130
+                    {churned?.users.toLocaleString()}
                   </span>
                   <span className="text-[1.5rem] font-semibold text-danger" style={{ fontVariantNumeric: "tabular-nums" }}>
-                    62.8%
+                    {churned?.value.toFixed(1)}%
                   </span>
                 </div>
                 <p className="mt-1.5 text-[0.8125rem] text-foreground/80">
@@ -54,7 +65,7 @@ export function Funnel() {
               </div>
             </div>
             <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-black/[0.06]">
-              <div className="h-full rounded-full bg-danger" style={{ width: "62.8%" }} />
+              <div className="h-full rounded-full bg-danger" style={{ width: `${churned?.value}%` }} />
             </div>
           </div>
 
@@ -70,19 +81,19 @@ export function Funnel() {
                 </div>
                 <div className="mt-2 flex items-baseline gap-3">
                   <span className="text-[1.75rem] font-bold leading-none tracking-tight text-foreground" style={{ fontVariantNumeric: "tabular-nums" }}>
-                    77
+                    {retained?.users.toLocaleString()}
                   </span>
                   <span className="text-[1.125rem] font-semibold text-success" style={{ fontVariantNumeric: "tabular-nums" }}>
-                    37.2%
+                    {retained?.value.toFixed(1)}%
                   </span>
                 </div>
                 <p className="mt-1 text-[0.8125rem] text-muted-foreground">
-                  Retried successfully using Slice Savings
+                  Retried successfully using In-App Wallet
                 </p>
               </div>
             </div>
             <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-black/[0.06]">
-              <div className="h-full rounded-full bg-success" style={{ width: "37.2%" }} />
+              <div className="h-full rounded-full bg-success" style={{ width: `${retained?.value}%` }} />
             </div>
           </div>
         </div>
@@ -94,9 +105,9 @@ export function Funnel() {
           <Lightbulb className="size-4" />
         </div>
         <p className="text-[0.875rem] leading-relaxed text-foreground/90">
-          The biggest opportunity is immediately after a merchant rejects Slice CC.
-          Only <span className="font-semibold text-foreground">37.2%</span> of users
-          discover the Slice Savings workaround organically.
+          The biggest opportunity is immediately after a merchant rejects a CC.
+          Only <span className="font-semibold text-foreground">{retained?.value.toFixed(1)}%</span> of users
+          discover the Wallet Fallback workaround organically.
         </p>
       </div>
     </Card>

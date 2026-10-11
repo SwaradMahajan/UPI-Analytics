@@ -1,6 +1,9 @@
 import { AlertTriangle } from "lucide-react";
+import { useSimulation } from "../SimulationContext";
 
 export function Hero() {
+  const { state } = useSimulation();
+
   return (
     <section className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[1fr_360px]">
       <div className="flex flex-col justify-center">
@@ -28,7 +31,7 @@ export function Hero() {
           </span>
         </div>
         <div className="mt-4 text-[3rem] font-semibold leading-none tracking-tight text-danger" style={{ fontSize: "3rem", fontVariantNumeric: "tabular-nums" }}>
-          62.8%
+          {state.mdrChurn.toFixed(1)}%
         </div>
         <p className="mt-2 text-[0.8125rem] leading-snug text-foreground/80">
           Users abandon within 5 minutes after an MDR rejection.

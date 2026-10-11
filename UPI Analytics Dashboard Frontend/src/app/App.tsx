@@ -7,8 +7,11 @@ import { ChurnAnalysis } from "./components/ChurnAnalysis";
 import { Opportunity } from "./components/Opportunity";
 import { Targets } from "./components/Targets";
 import { FindingsTable } from "./components/FindingsTable";
+import { useSimulation } from "./SimulationContext";
 
 export default function App() {
+  const { state } = useSimulation();
+  
   return (
     <div className="relative min-h-screen w-full text-foreground">
       {/* Paper ground with soft warm light so the glass cards catch color (v11 aesthetic) */}
@@ -27,18 +30,28 @@ export default function App() {
       <Header />
       <main className="mx-auto max-w-[1440px] px-8 py-8">
         <div className="flex flex-col gap-8">
-          <Hero />
-          <KpiCards />
-          <StatusDistribution />
-          <Funnel />
-          <ChurnAnalysis />
-          <Opportunity />
-          <Targets />
-          <FindingsTable />
+          <div id="Dashboard" className="flex flex-col gap-8">
+            <Hero />
+            <KpiCards />
+          </div>
+          <div id="Transaction Analysis" className="flex flex-col gap-8 scroll-mt-24">
+            <StatusDistribution />
+            <Funnel />
+          </div>
+          <div id="Churn Analysis" className="flex flex-col gap-8 scroll-mt-24">
+            <ChurnAnalysis />
+          </div>
+          <div id="Fallback Performance" className="flex flex-col gap-8 scroll-mt-24">
+            <Opportunity />
+          </div>
+          <div id="Experiment Metrics" className="flex flex-col gap-8 scroll-mt-24">
+            <Targets />
+            <FindingsTable />
+          </div>
         </div>
         <footer className="mt-10 flex items-center justify-between border-t border-border pt-6 text-[0.75rem] text-muted-foreground">
-          <span>Slice Analytics · UPI Payment Insights</span>
-          <span>Data window: Jul 23 – Aug 22, 2026 · 10,000 transactions</span>
+          <span>UPI Payment Analytics</span>
+          <span>Data window: Jul 23 – Aug 22, 2026 · {state.totalTransactions.toLocaleString()} transactions</span>
         </footer>
       </main>
     </div>

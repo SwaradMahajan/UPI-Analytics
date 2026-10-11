@@ -1,9 +1,18 @@
 import { ArrowRight } from "lucide-react";
 import { Card, SectionHeading } from "./primitives";
-import { statusDistribution } from "./data";
+import { useSimulation } from "../SimulationContext";
 
 export function StatusDistribution() {
-  const max = Math.max(...statusDistribution.map((s) => s.count));
+  const { derivedData, state } = useSimulation();
+  const { statusDistribution } = derivedData;
+  const max = Math.max(...statusDistribution.map((s: any) => s.count));
+
+  const totalFailed = statusDistribution
+    .filter((s: any) => s.key !== "success")
+    .reduce((sum: number, s: any) => sum + s.count, 0);
+  const mdrCount = statusDistribution.find((s: any) => s.key === "mdr")?.count || 0;
+  const mdrOfFailedPct = totalFailed > 0 ? ((mdrCount / totalFailed) * 100).toFixed(1) : "0.0";
+
   return (
     <Card className="p-6" elevated>
       <SectionHeading
@@ -13,7 +22,7 @@ export function StatusDistribution() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
         {/* Bars */}
         <div className="flex flex-col gap-4">
-          {statusDistribution.map((s) => (
+          {statusDistribution.map((s: any) => (
             <div key={s.key} className="group">
               <div className="mb-1.5 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -31,7 +40,7 @@ export function StatusDistribution() {
                 </div>
                 <div className="flex items-baseline gap-2" style={{ fontVariantNumeric: "tabular-nums" }}>
                   <span className="text-[0.875rem] text-foreground">{s.count.toLocaleString()}</span>
-                  <span className="text-[0.75rem] text-muted-foreground">{s.pct}%</span>
+                  <span className="text-[0.75rem] text-muted-foreground">{s.pct.toFixed(2)}%</span>
                 </div>
               </div>
               <div className="h-2.5 w-full overflow-hidden rounded-full bg-black/[0.06]">
@@ -51,7 +60,7 @@ export function StatusDistribution() {
         {/* Insight panel */}
         <div className="flex flex-col justify-center rounded-xl border border-magenta/25 bg-magenta/[0.06] p-5">
           <div className="text-[2.25rem] font-bold leading-none tracking-tight text-magenta" style={{ fontSize: "2.25rem", fontVariantNumeric: "tabular-nums" }}>
-            12.7%
+            {mdrOfFailedPct}%
           </div>
           <p className="mt-2 text-[0.8125rem] leading-snug text-foreground">
             of all failed transactions are MDR rejections
