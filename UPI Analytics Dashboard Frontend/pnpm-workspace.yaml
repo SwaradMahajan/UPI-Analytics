@@ -12,4 +12,5 @@ supportedArchitectures:
     - musl
 allowBuilds:
   '@tailwindcss/oxide': true
+  core-js: true
   esbuild: true

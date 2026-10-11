@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { Download, Play, RotateCcw, SlidersHorizontal, Zap } from "lucide-react";
+import { Download, Loader2, Play, RotateCcw, SlidersHorizontal, Zap } from "lucide-react";
 import { navItems } from "./data";
 import { defaultState, useSimulation } from "../SimulationContext";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
+import { exportDashboardToPdf } from "../utils/exportPdf";
 
 export function Header() {
   const [active, setActive] = useState("Dashboard");
   const [isOpen, setIsOpen] = useState(false);
-  const { state, setState, resetState } = useSimulation();
+  const [isExporting, setIsExporting] = useState(false);
+  const { state, setState, resetState, derivedData } = useSimulation();
   const [draftState, setDraftState] = useState(state);
 
   const handleOpenChange = (open: boolean) => {
@@ -22,6 +24,17 @@ export function Header() {
   const handleSimulate = () => {
     setState(draftState);
     setIsOpen(false);
+  };
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      await exportDashboardToPdf({ state, derivedData });
+    } catch (error) {
+      console.error("Export error:", error);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleReset = () => {
@@ -182,9 +195,24 @@ export function Header() {
             </PopoverContent>
           </Popover>
 
-          <button className="flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-[0.8125rem] font-medium text-primary-foreground transition-colors hover:bg-primary/90">
-            <Download className="size-3.5" />
-            Export
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={isExporting}
+            className="flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-[0.8125rem] font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-70 cursor-pointer shadow-xs"
+            title="Download PDF Insights Report"
+          >
+            {isExporting ? (
+              <>
+                <Loader2 className="size-3.5 animate-spin" />
+                <span>Exporting...</span>
+              </>
+            ) : (
+              <>
+                <Download className="size-3.5" />
+                <span>Export</span>
+              </>
+            )}
           </button>
         </div>
       </div>
